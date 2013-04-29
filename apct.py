@@ -32,10 +32,10 @@ class myFile:
 		return
 
 	def MoveTo(self, targetPath, OverWrite):
-		print "target patch " + targetPath
-		print "self.Name " + self.Name
+		#print "target patch " + targetPath
+		#print "self.Name " + self.Name
 		fileNameDest = os.path.join(targetPath,self.Name)
-		print "fileNameDest " + fileNameDest
+		#print "fileNameDest " + fileNameDest
 		if os.path.isfile(fileNameDest):
 			if OverWrite:
 				os.remove(fileNameDest)
@@ -43,7 +43,7 @@ class myFile:
 				print "File already exist"
 				return
 		try:
-			print "Move " + self.Path + " -> " + fileNameDest 
+			print "Move {0} -> {1}".format( self.Path, fileNameDest)
 			shutil.move( self.Path , fileNameDest)
 		except:
 			print "Error in File IO operation"
@@ -72,11 +72,12 @@ def strClean(str):
 		else:
 			c += str[index]
 				
-	while (c.find('  ') > 0):
-		c = c.replace ('  ',' ')
+	while (c.find("  ") > -1):
+		c = c.replace ("  "," ")
 	return c
 	
 def ScanInputPath(path):
+	print "Scanning input patch " + path
 	fileList = list()
 	regex = re.compile("[sS]?\d?\d[xXeEsS]\d\d")# re 00x11 or 0x11 or 00X11 or 0X11 or S01E01 or s01s02
 	#	scan file
@@ -89,14 +90,14 @@ def ScanInputPath(path):
 			t.Name = fileName
 			t.Path = fileNamePath
 			#remove all chare befoar s01x02
-			print fileName
+			print "Input file " + fileName
 			t.lowCaseName = strClean(fileName[0:fileName.index(match[0])]).lower().strip()
 			fileList.append(t)
 	return fileList
 	
 def ScanOutPath(path):
 	OutPathList = list()
-	print "Out directory " + path
+	print "Scanning out path " + path
 	#	Load directory and clean
 	for dirName in listdirs(path):
 		if (dirName.find('./.') == -1):
