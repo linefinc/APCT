@@ -3,7 +3,6 @@ import os
 import sys
 import re
 import shutil
-#import urllib
 import httplib
 import pdb
 
@@ -191,9 +190,6 @@ def main(argv):
 			file.MoveTo(targerDir.Path, True)
 			
 	if(counter > 0):
-		#myUrl = urllib.urlopen("http://localhost:8080/xbmcCmds/xbmcHttp?command=ExecBuiltIn(UpdateLibrary(Video))")
-		#s = myUrl.read()
-		#myUrl.close()
 		# require update via json
 		params = '{"jsonrpc":"2.0","id":2,"method":"VideoLibrary.Scan"}'
 		headers = {"Content-type": "application/json","Accept": "text/plain, application/json, text/javascript"}
