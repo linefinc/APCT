@@ -3,7 +3,8 @@ import os
 import sys
 import re
 import shutil
-import urllib
+#import urllib
+import httplib
 import pdb
 
 class myDirecory:
@@ -12,12 +13,23 @@ class myDirecory:
 	lowCaseName = ""
 	
 class myFile:
+	"file support class"
 	Name = ""
 	lowCaseName = ""
 	Path = ""
 	def CopyTo(self, targetPath, OverWrite):
 		fileNameDest = os.path.join(targetPath,self.Name)
 		print "target patch " + targetPath
+		fileSize = os.stat(self.Path).st_size
+		
+		print "file size" + str (fileSize)
+		
+		FreeSpaceInTargetDevice = os.statvfs(targetPath).f_favail
+		
+		if(FreeSpaceInTargetDevice < fileSize):
+			print "No free space available"
+			return;
+		
 		if os.path.isfile(fileNameDest):
 			if OverWrite:
 				os.remove(fileNameDest)
@@ -53,18 +65,21 @@ class myFile:
 #	get list of dir
 #
 def listdirs(folder):
+	"get list of folder in a particular directory"
 	return [d for d in (os.path.join(folder, d1) for d1 in os.listdir(folder))
         if os.path.isdir(d)]
 #
 #	get list of file
 #
 def listfiles(folder):
+	"get list of file in a particular directory"
 	return [d for d in (os.path.join(folder, d1) for d1 in os.listdir(folder))
         if os.path.isfile(d)]
 #
 #	splace not alpha caraceter
 #
 def strClean(str):
+	"replace all characters not alphabetic or numeric"
 	c = ""
 	for index in range (len(str)):
 		if ( (str[index].isalnum())==False):
@@ -125,13 +140,13 @@ def ShowHelp():
 def main(argv): 
 	outDirecotryList = list()
 	inListFile = list()
-	index = 0
 	
 	if(len(argv) == 0):
 		print 'apct: Missing file operand'
 		ShowHelp()
 		return
 
+	index = 0
 	while (index < len(argv)):
 		# scan parameters
 		increase_step = 1
@@ -176,9 +191,17 @@ def main(argv):
 			file.MoveTo(targerDir.Path, True)
 			
 	if(counter > 0):
-		myUrl = urllib.urlopen("http://localhost:8080/xbmcCmds/xbmcHttp?command=ExecBuiltIn(UpdateLibrary(Video))")
-		s = myUrl.read()
-		myUrl.close()
+		#myUrl = urllib.urlopen("http://localhost:8080/xbmcCmds/xbmcHttp?command=ExecBuiltIn(UpdateLibrary(Video))")
+		#s = myUrl.read()
+		#myUrl.close()
+		# require update via json
+		params = '{"jsonrpc":"2.0","id":2,"method":"VideoLibrary.Scan"}'
+		headers = {"Content-type": "application/json","Accept": "text/plain, application/json, text/javascript"}
+		conn = httplib.HTTPConnection('localhost', 8080)
+		conn.request("POST", "/jsonrpc?awx", params, headers)
+		response = conn.getresponse()
+		data = response.read()
+		conn.close()
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
